@@ -1,5 +1,5 @@
 async = require 'async'
-{exec} = require 'child_process'
+{spawn} = require 'child_process'
 fs = require 'fs'
 mkdirp = require 'mkdirp'
 {ncp} = require 'ncp'
@@ -104,11 +104,9 @@ directory \"#{rootPath}\" already exists"
           helpers.log 'installing npm packages...'
           prevDir = process.cwd()
           process.chdir rootPath
-          exec 'npm install', (error) ->
+          npm_install = spawn 'npm',['install'],customFds : [0, 1, 2]
+          npm_install.on 'exit',->
             process.chdir prevDir
-            if error?
-              helpers.logError "npm error: #{error}"
-              return callback error
             helpers.log 'installed npm package brunch-extensions'
             callback()
 
